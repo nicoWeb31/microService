@@ -1,11 +1,13 @@
 import express from 'express';
 import { randomBytes } from 'crypto';
 import cors from 'cors';
+import morgan from 'morgan';
 
 
 const app = express();
 app.use(express.json({ limit: "10kb" }));
 app.use(cors());
+app.use(morgan("dev"));
 
 const posts = {}
 
