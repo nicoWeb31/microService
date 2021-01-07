@@ -7,6 +7,12 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan("dev"));
 
+app.use((req, res,next) => {
+
+    console.log(req.body)
+    next();
+})
+
 //
 // posts = {
 //     'sdfsdfs': {
@@ -15,25 +21,33 @@ app.use(morgan("dev"));
 //         comments: [{id:'sdfsdf', content:'tsdfsfsdfsd'}]
 //     }
 // }
-const posts = {};
+let posts = {};
 
-app.get("/posts", (req, res) => {});
+app.get("/posts", (req, res) => {
+    res.send(posts);
+});
 
 app.post("/events", (req, res) => {
-  const { type, data } = req.body;
-  if (type === "postCreate") {
-    const { id, title } = data;
-    posts[id] = { id, title, comments: [] };
-  }
+    console.log(req.body)
+    const { type, data } = req.body;
+    if (type === "postCreate") {
+        const { id, title } = data;
+        posts[id] = { id, title, comments: [] };
+    }
+    
+    if (type === "CommentCreated") {
+        const { id, content, postId } = data;
+        const post = posts[postId];
 
-  if (type === "CommentCreated") {
-    const { id, content, postId } = data;
-    const post = posts[id];
-
-    post.comments.push({ id, content });
-  }
+        
+        post.comments.push({ id, content });
+    }
+    
+    
+    console.log("🚀 ~ file: index.js ~ line 19 ~ posts", posts)
+    res.send({})
 });
 
 app.listen(4001, () => {
-  console.log("listening on 4001 , query server");
+    console.log("listening on 4001 , query server");
 });

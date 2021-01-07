@@ -13,36 +13,36 @@ const commentsByPostId = {};
 
 app.get("/posts/:id/comments", (req, res) => {
     res.send(commentsByPostId[req.params.id] || []);
-    
 });
 
-app.post("/posts/:id/comments", async(req, res) => {
+app.post("/posts/:id/comments", async (req, res) => {
     const commentId = randomBytes(4).toString("hex");
     const { content } = req.body;
-    console.log("🚀 ~ file: index.js ~ line 21 ~ app.post ~ content", req.body)
-    
+
     const comments = commentsByPostId[req.params.id] || [];
-    
+
     comments.push({ id: commentId, content });
     commentsByPostId[req.params.id] = comments;
 
-    await axios.post('http://localhost:4006/events',{
-        type: 'CommentCreated',
-        data:{
-            id: commentId,
-            content,
-            postId: req.params.id
-        }
-    })
-    
-    
+    const data = {
+        id: commentId,
+        content,
+        postId: req.params.id,
+    };
+    console.log(data);
+
+    await axios.post("http://localhost:4006/events", {
+        type: "CommentCreated",
+        data,
+    });
+
     res.status(201).send(comments);
 });
 
-app.post('/events', (req, res) => {
-    console.log('received events',req.body.type);
-    res.send({})
-})
+app.post("/events", (req, res) => {
+    console.log("received events", req.body.type);
+    res.send({});
+});
 
 app.listen(4005, () => {
     console.log("servise càomments run well on port 4005 !");
