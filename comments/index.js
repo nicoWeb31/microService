@@ -2,6 +2,7 @@ import express from "express";
 import { randomBytes } from "crypto";
 import cors from "cors";
 import morgan from "morgan";
+import axios from "axios";
 
 const app = express();
 app.use(express.json());
@@ -15,7 +16,7 @@ app.get("/posts/:id/comments", (req, res) => {
     
 });
 
-app.post("/posts/:id/comments", (req, res) => {
+app.post("/posts/:id/comments", async(req, res) => {
     const commentId = randomBytes(4).toString("hex");
     const { content } = req.body;
     console.log("🚀 ~ file: index.js ~ line 21 ~ app.post ~ content", req.body)
@@ -23,12 +24,25 @@ app.post("/posts/:id/comments", (req, res) => {
     const comments = commentsByPostId[req.params.id] || [];
     
     comments.push({ id: commentId, content });
-    
     commentsByPostId[req.params.id] = comments;
+
+    await axios.post('http://localhost:4006/events',{
+        type: 'CommentCreated',
+        data:{
+            id: commentId,
+            content,
+            postId: req.params.id
+        }
+    })
+    
     
     res.status(201).send(comments);
 });
-console.log("🚀 ~ file: index.js ~ line 12 ~ commentsByPostId", commentsByPostId)
+
+app.post('/events', (req, res) => {
+    console.log('received events',req.body.type);
+    res.send({})
+})
 
 app.listen(4005, () => {
     console.log("servise càomments run well on port 4005 !");

@@ -1,27 +1,41 @@
 import express from 'express';
 import axios from 'axios';
+import morgan from 'morgan';
 
 
 
 
 const app = express();
 app.use(express.json());
+app.use(morgan('dev'));
+
+app.use((req, res, next) => {
+    console.log(req.body);
+    next();
+});
 
 
-app.post('/event',(req, res) => {
-    const event = req.body;
+app.post('/events',async(req, res) => {
 
-    axios.post('http://localhost:4000/events',{event})//posts
-    axios.post('http://localhost:4005/events',{event})//comments
-    axios.post('http://localhost:4001/events',{event})//query service
-
-
-    res.send({status: 'success'})
+    try {
+        const event = req.body;
+        console.log(event)
+    
+        await axios.post('http://localhost:4000/events',event)//posts
+        await axios.post('http://localhost:4005/events',event)//comments
+        await axios.post('http://localhost:4001/events',event)//query service
+    
+    
+        res.send({status: 'success'})
+        
+    } catch (error) {
+        console.log(error)
+    }
 
 })
 
 
 
-app.listen(4003,() => {
+app.listen(4006,() => {
     console.log('server eventBus work on port 4006');
 })
