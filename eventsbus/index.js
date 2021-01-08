@@ -14,12 +14,15 @@ app.use((req, res, next) => {
     next();
 });
 
+const events = [];
 
 app.post('/events',async(req, res) => {
 
     try {
         const event = req.body;
         console.log(event)
+
+        events.push(event);
     
         await axios.post('http://localhost:4000/events',event)//posts
         await axios.post('http://localhost:4005/events',event)//comments
@@ -36,6 +39,11 @@ app.post('/events',async(req, res) => {
         console.log(error)
     }
 
+})
+
+
+app.get('/events',(req, res)=>{
+    res.send(events)
 })
 
 
