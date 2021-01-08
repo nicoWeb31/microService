@@ -24,6 +24,12 @@ app.post('/events',async(req, res) => {
         await axios.post('http://localhost:4000/events',event)//posts
         await axios.post('http://localhost:4005/events',event)//comments
         await axios.post('http://localhost:4001/events',event)//query service
+
+        if(event.type === 'CommentCreated'){
+
+            await axios.post('http://localhost:4003/events',event)//modo service
+        }
+
     
     
         res.send({status: 'success'})
