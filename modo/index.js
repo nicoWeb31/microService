@@ -12,21 +12,22 @@ app.use((req, res, next) => {
 });
 
 app.post("/events", async (req, res) => {
-    const { type, data } = req.body;
+    const { type, data : dataI } = req.body;
 
     if (type === "CommentCreated") {
-        const status = data.content.includes("cono") ? "rejected" : "approved";
+        const status = dataI.content.includes("cono") ? "rejected" : "approved";
 
         const data = {
-            // postId: data.id,
-            // status,
-            // content: data.content
-            status: status,
-            ...req.body,
+            id: dataI.id,
+            postId: dataI.postId,
+            status,
+            content: dataI.content
+            // status: status,
+            // ...req.body,
         };
         console.log("🚀 ~ file: index.js ~ line 27 ~ app.post ~ data", data)
 
-        await axios.post("http://localhost:4006", {
+        await axios.post("http://localhost:4006/events", {
             type: "commentModerated",
             data,
         });
